@@ -1,0 +1,21 @@
+Algorithm/FloodControl
+======================
+
+Algorithm::FloodControl is used to limit
+processing of events to a limited ratio of 
+count per time period.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2004 Vladi Belperchinov-Shabanski <cade@cpan.org>
+
