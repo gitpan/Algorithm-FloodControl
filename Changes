@@ -1,6 +1,4 @@
 Revision history for Perl extension Algorithm::FloodControl.
 
-0.01  Sun Feb 29 02:55:03 2004
-	  initial release
-	  
-
+1.90  Tue Nov 4 04:08:38 2008
+	  Support for OO. Backends for Cache::Memcached(::Fast), Cache::FastMmap

@@ -1,11 +1,17 @@
-use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-WriteMakefile(
-    'NAME'		=> 'Algorithm::FloodControl',
-    'VERSION_FROM'	=> 'FloodControl.pm', # finds $VERSION
-    'PREREQ_PM'		=> {}, # e.g., Module::Name => 1.1
-    ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM => 'FloodControl.pm', # retrieve abstract from module
-       AUTHOR     => 'Vladi Belperchinov-Shabanski <cade@cpan.org>') : ()),
-);
+use inc::Module::Install;
+
+name     'Algorithm-FloodControl';
+all_from 'lib/Algorithm/FloodControl.pm';
+author   'Andrey Kostenko <andrey@kostenko.name>';
+
+build_requires 'Test::More';
+test_requires 'Cache::FastMmap';
+test_requires 'File::Temp';
+requires 'Module::Load';
+requires 'Params::Validate';
+requires 'Class::Accessor::Fast';
+
+auto_install;
+
+WriteAll;
+
