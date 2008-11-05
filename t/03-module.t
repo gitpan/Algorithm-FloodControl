@@ -26,7 +26,6 @@ use Test::More tests => 5;
 
 use Algorithm::FloodControl;
 my $control = Algorithm::FloodControl->new(
-    {
         storage => new Cache::FastMmap ( { share_file => File::Temp->new->filename }),
         limits => {
             check_auth_data => [
@@ -39,7 +38,6 @@ my $control = Algorithm::FloodControl->new(
                 }
             ]
         }
-    }
 );
 ok( $control );
 ok( ! $control->is_user_overrated( check_auth_data => "test_$$") );

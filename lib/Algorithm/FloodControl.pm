@@ -5,17 +5,18 @@ use warnings;
 use utf8;
 
 use Carp;
+use Params::Validate qw/:all/;
 use base 'Class::Accessor::Fast';
 use Exporter 'import';
 use Module::Load;
 
-our $VERSION = '1.90';
+our $VERSION = '1.91';
 our @EXPORT  = qw(
   flood_check
   flood_storage
 );
 
-# $Id: FloodControl.pm 3 2008-11-04 00:17:57Z gugu $
+# $Id: FloodControl.pm 6 2008-11-05 11:58:37Z gugu $
 # $Source$
 # $HeadURL: file:///var/svn/Algorithm-FloodControl/lib/Algorithm/FloodControl.pm $
 
@@ -82,7 +83,11 @@ sub flood_storage {
 
 sub new {
     my $class = shift;
-    my $params = shift;
+    my $params = validate @_, {
+        storage => { type => OBJECT },
+        backend_name => { type => SCALAR, optional => 1 },
+        limits => { type => HASHREF }
+    };
     my $self = $class->SUPER::new( $params );
     # be default backend will be selected by storage classname. but you can override it
     my $backend_name = __PACKAGE__ . '::Backend::' . ( $self->{backend_name} || ref $self->storage );
@@ -92,10 +97,8 @@ sub new {
 }
 
 sub is_user_overrated {
-    my ($self, $limit, $identifier) = @_;
-    if ( ! $identifier || ! $limit ) {
-        confess 'Usage: $self->is_user_overrated( limit => user_identifier )';
-    }
+    my $self = shift;
+    my ( $limit, $identifier ) = validate_pos @_, { type => SCALAR }, { type => SCALAR };
     my @configs = @{ $self->{ limits }{ $limit } };
     foreach my $config ( @configs ) {
         my $prefix = __PACKAGE__ . '_rc_' . "$identifier|$limit|$config->{period}";
@@ -112,10 +115,8 @@ sub is_user_overrated {
 }
 
 sub get_attempt_count {
-    my ( $self, $limit, $identifier ) = @_;
-    if ( ! $identifier || ! $limit ) {
-        croak 'Usage: $self->get_attempt_count( limit => user_identifier )';
-    }
+    my $self = shift;
+    my ( $limit, $identifier ) = validate_pos @_, { type => SCALAR }, { type => SCALAR };
     my %attempts;
     my @configs = @{ $self->{ limits }{ $limit } };
     foreach my $config ( @configs ) {
@@ -131,12 +132,11 @@ sub get_attempt_count {
 }
 
 sub register_attempt {
-    my ( $self, $limit, $identifier ) = @_;
-    if ( ! $identifier || ! $limit ) {
-        croak 'Usage: $self->register_attempt( limit => user_identifier )';
-    }
+    my $self = shift;
+    my ( $limit, $identifier ) = validate_pos @_, { type => SCALAR }, { type => SCALAR };
     my $is_robot;
     my @configs = @{ $self->{ limits }{ $limit } };
+    my $is_overrated = $self->is_user_overrated( @_ );
     foreach my $config ( @configs ) {
         my $prefix = __PACKAGE__ . '_rc_' . "$identifier|$limit|$config->{period}";
         my $queue = $self->backend_name->new( {
@@ -146,7 +146,7 @@ sub register_attempt {
         } );
         $queue->increment;
     }
-    return;
+    return $is_overrated;
 }
 
 1;
@@ -177,7 +177,7 @@ Algorithm::FloodControl - Limit event processing to count/time ratio.
 
     use Algorithm::FloodControl ();
 
-    my $flood_control = Algorithm::FloodControl->new( {
+    my $flood_control = Algorithm::FloodControl->new(
         storage => $memd, 
         limits => {
             limit_name => [
@@ -190,7 +190,7 @@ Algorithm::FloodControl - Limit event processing to count/time ratio.
                 }
             ]
         }
-    } );
+    );
 
     $flood_control->register_attempt( limit_name => 'vasja_pupkin' );
 
@@ -309,7 +309,7 @@ be useful. I used it in IRC bots, email notifications, web site updates, etc.
 
 =head1 VERSION
 
-    $Id: FloodControl.pm 3 2008-11-04 00:17:57Z gugu $
+    $Id: FloodControl.pm 6 2008-11-05 11:58:37Z gugu $
 
 =cut
 
