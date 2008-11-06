@@ -20,6 +20,7 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
+t/tlib.pm
 t/00-load.t
 t/01-cache-memcached-fast.t
 t/02-cache-memcached.t

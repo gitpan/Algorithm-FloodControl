@@ -1,6 +1,8 @@
 Revision history for Perl extension Algorithm::FloodControl.
 
-1.92  Чтв Ноя  6 15:56:46 MSK 2008
+1.95  Я хочу есть и спать. А не править баги в этом модуле.
+1.94  Опять проебал
+1.93  Чтв Ноя  6 15:56:46 MSK 2008
       SIGNATURE
 1.92  Чтв Ноя 6 15:49:01 MSK 2008
       is_user_overrated returns not only true/false, but timeout until unlocking

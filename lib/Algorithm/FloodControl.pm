@@ -10,7 +10,7 @@ use base 'Class::Accessor::Fast';
 use Exporter 'import';
 use Module::Load;
 
-our $VERSION = '1.93';
+our $VERSION = '1.95';
 our @EXPORT  = qw(
   flood_check
   flood_storage
@@ -110,7 +110,7 @@ sub is_user_overrated {
         } );
         my $info = $backend->get_info;
         if ( $info->{size} >= $config->{attempts} && $info->{timeout} > $max_timeout ) {
-            $max_timeout = $info->{timeout};
+            $max_timeout = $info->{timeout} - time;
         }
     }
     return $max_timeout;
@@ -308,6 +308,12 @@ be useful. I used it in IRC bots, email notifications, web site updates, etc.
     Andrey Kostenko "GuGu" <andrey@kostenko.name>
 
     http://kostenko.name
+
+=head1 COPYRIGHT & LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
 
 =head1 VERSION
 
