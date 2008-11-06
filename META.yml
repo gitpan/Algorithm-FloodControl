@@ -23,4 +23,4 @@ requires:
   Params::Validate: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.95
+version: 1.96
