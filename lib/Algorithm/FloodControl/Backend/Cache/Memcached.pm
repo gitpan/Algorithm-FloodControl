@@ -20,7 +20,7 @@ sub increment {
     if ( ! $is_added ) {
         $last_value = $self->storage->incr( $self->_tail_name );
     }
-    $self->storage->set( $self->_item_name($last_value) => 1, $self->expires );
+    $self->storage->set( $self->_item_name($last_value) => time + $self->expires, $self->expires );
     return $last_value;
 }
 
@@ -33,22 +33,31 @@ sub clear {
     return $self->storage->delete( $self->_tail_name );
 }
 
-=head2 size
+=head2 get_info
 
 =cut
 
-sub size {
+sub get_info {
     my $self   = shift;
     my $size   = 0;
     my $number = $self->_last_number;
     if ( ! defined $number ) {
-        return $size;
+        return {
+            size => $size,
+            timeout => 0
+        };
     }
-    while ( defined $self->get_item($number) ) {
+    my $last_timeout;
+    my $timeout;
+    while ( defined ( $timeout = $self->get_item($number) ) ){
+        $last_timeout = $timeout;
         $size++;
         $number--;
     }
-    return $size;
+    return {
+        size => $size, 
+        timeout => $last_timeout
+    };
 }
 
 =head2 get_item
@@ -63,7 +72,6 @@ sub get_item {
 
 sub _last_number {
     my $self = shift;
-    $DB::single = 1;
     return $self->storage->get( $self->_tail_name );
 }
 

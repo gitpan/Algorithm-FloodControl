@@ -10,13 +10,13 @@ use base 'Class::Accessor::Fast';
 use Exporter 'import';
 use Module::Load;
 
-our $VERSION = '1.91';
+our $VERSION = '1.92';
 our @EXPORT  = qw(
   flood_check
   flood_storage
 );
 
-# $Id: FloodControl.pm 6 2008-11-05 11:58:37Z gugu $
+# $Id: FloodControl.pm 7 2008-11-06 12:51:33Z gugu $
 # $Source$
 # $HeadURL: file:///var/svn/Algorithm-FloodControl/lib/Algorithm/FloodControl.pm $
 
@@ -100,18 +100,20 @@ sub is_user_overrated {
     my $self = shift;
     my ( $limit, $identifier ) = validate_pos @_, { type => SCALAR }, { type => SCALAR };
     my @configs = @{ $self->{ limits }{ $limit } };
+    my $max_timeout = 0;
     foreach my $config ( @configs ) {
         my $prefix = __PACKAGE__ . '_rc_' . "$identifier|$limit|$config->{period}";
-        my $queue = $self->backend_name->new( {
+        my $backend = $self->backend_name->new( {
             storage => $self->storage,
             expires => $config->{ period },
             prefix => $prefix
         } );
-        if ( $queue->size >= $config->{attempts} ) {
-            return 1;
+        my $info = $backend->get_info;
+        if ( $info->{size} >= $config->{attempts} && $info->{timeout} > $max_timeout ) {
+            $max_timeout = $info->{timeout};
         }
     }
-    return;
+    return $max_timeout;
 }
 
 sub get_attempt_count {
@@ -126,7 +128,7 @@ sub get_attempt_count {
             expires => $config->{ period },
             prefix => $prefix
         } );
-        $attempts{ $config->{ period } } = $queue->size;
+        $attempts{ $config->{ period } } = $queue->get_info->{size};
     }
     return \%attempts;
 }
@@ -260,7 +262,7 @@ Returns count of attempts
 
 =item is_user_overrated( $identifier )
 
-Returns true if user have reached his limits
+If user have reached his limits returns time to unlocking in seconds. Otherwise returns 0
 
 =back
 
@@ -309,7 +311,7 @@ be useful. I used it in IRC bots, email notifications, web site updates, etc.
 
 =head1 VERSION
 
-    $Id: FloodControl.pm 6 2008-11-05 11:58:37Z gugu $
+    $Id: FloodControl.pm 7 2008-11-06 12:51:33Z gugu $
 
 =cut
 
