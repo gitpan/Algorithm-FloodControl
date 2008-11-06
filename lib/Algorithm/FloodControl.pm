@@ -10,7 +10,7 @@ use base 'Class::Accessor::Fast';
 use Exporter 'import';
 use Module::Load;
 
-our $VERSION = '1.92';
+our $VERSION = '1.93';
 our @EXPORT  = qw(
   flood_check
   flood_storage

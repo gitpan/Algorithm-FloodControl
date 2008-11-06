@@ -21,4 +21,4 @@ requires:
   Class::Accessor::Fast: 0
   Module::Load: 0
   Params::Validate: 0
-version: 1.92
+version: 1.93
