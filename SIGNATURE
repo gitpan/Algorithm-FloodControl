@@ -15,9 +15,9 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 4b965af34c2df36269d204281645bc48770468d7 .cvsignore
-SHA1 77d6aeed69d3b8a8014eaab6a0648903ec2b8096 Changes
+SHA1 0bf137aa89c731a2466cd46f3958918fdcc1441b Changes
 SHA1 fdf78441808b9e419791e7428b7b870505d83943 MANIFEST
-SHA1 a6219046f181cdff1e65b323bb89fad75ae0876d META.yml
+SHA1 164a3007d27d2f3351b9527bb7c0357c6ab9aa4e META.yml
 SHA1 a6635a3fae996f899132c21d03cc7cfd70bfe15f Makefile.PL
 SHA1 73af7dba8096be943364f3eb0c60dfa2bfd957e5 README
 SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
@@ -31,23 +31,23 @@ SHA1 5cefb891354bdf6259227c56950272194fd58d1b inc/Module/Install/Makefile.pm
 SHA1 692c7572df94e8304ec61cd8d8e306df477fed0c inc/Module/Install/Metadata.pm
 SHA1 e3acd82e8b4cd43ca62dd2119402a66ad54460f0 inc/Module/Install/Win32.pm
 SHA1 49c8e7f52761eb5869618e065bb4b8e52697de36 inc/Module/Install/WriteAll.pm
-SHA1 cd90260ce510cc5550c57a81858730f29167b5f5 lib/Algorithm/FloodControl.pm
-SHA1 c05507b7ad3578e6cd8d707fc4ab90b6845f9ed0 lib/Algorithm/FloodControl/Backend/Cache/FastMmap.pm
-SHA1 c3374ec86aed7332fb9194e49c11ee7a34d2aac6 lib/Algorithm/FloodControl/Backend/Cache/Memcached.pm
+SHA1 bf8e43c76c160e1569e8ca06bd5babaddbac61c5 lib/Algorithm/FloodControl.pm
+SHA1 c892012005e58a4052d423d4a4f041d4e41f08b0 lib/Algorithm/FloodControl/Backend/Cache/FastMmap.pm
+SHA1 806ce1f3bc04ee70d2b562afd1168973debfc67b lib/Algorithm/FloodControl/Backend/Cache/Memcached.pm
 SHA1 0a6eb7dfe7eea3e88bad1748cc7167f710b4fc64 lib/Algorithm/FloodControl/Backend/Cache/Memcached/Fast.pm
 SHA1 bf4e7f0d3ab470f46a4cc03c8d243b62d07f807d t/00-load.t
 SHA1 d617edb013d9307c7981d63be26e05680702d461 t/01-cache-memcached-fast.t
-SHA1 a99637aee3eaa6477590faf9a83079b8098d1cd8 t/02-cache-memcached.t
+SHA1 af6c3845ee2d3c5779654f02f519aa9f67047241 t/02-cache-memcached.t
 SHA1 8f9f65c6e8abbb3e4cd98c10ec4f10f051999418 t/03-module.t
 SHA1 fd875722935e78099d2f93dd666871d810cc8fc9 t/04-cache-fastmmap.t
 SHA1 bf48e25e6079736e710a1af60aa5f9cb473e4763 t/boilerplate.t
 SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
 SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
-SHA1 1fffe6ef1a4891ed7c23667334f8c50882eeb884 t/tlib.pm
+SHA1 507f119b16a3eb78d8ee6eeb9440353ffeec152e t/tlib.pm
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.9 (GNU/Linux)
 
-iEYEARECAAYFAkkS9eAACgkQRhCwoH5m5RS6bgCffRXsN20/1PEA+R8qhYfWdH9E
-ThgAoMc2jm/C4uP+ppSK5fnR/OJvzhry
-=WRd3
+iEYEARECAAYFAkkTFnQACgkQRhCwoH5m5RQ3nACgx91uPSGICIKOJ2S4ug8b4p9D
+v1AAoIZyfpra4M1kjKLvXj1zUpSa9ioy
+=3oMb
 -----END PGP SIGNATURE-----

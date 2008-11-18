@@ -3,6 +3,7 @@ package Algorithm::FloodControl;
 use strict;
 use warnings;
 use utf8;
+use 5.008000;
 
 use Carp;
 use Params::Validate qw/:all/;
@@ -10,8 +11,8 @@ use base 'Class::Accessor::Fast';
 use Exporter 'import';
 use Module::Load;
 
-our $VERSION = '1.96';
-our @EXPORT  = qw(
+use version; our $VERSION = qv("1.97");
+our @EXPORT = qw(
   flood_check
   flood_storage
 );
@@ -22,8 +23,6 @@ our @EXPORT  = qw(
 
 __PACKAGE__->mk_accessors(qw/backend_name storage limits/);
 
-
-
 my %FLOOD = ();
 
 sub flood_check {
@@ -31,7 +30,7 @@ sub flood_check {
     my $fp = shift;    # max flood time period for $fc events
     my $en = shift;    # event name (key) which identifies flood check data
 
-    if ( $en eq '' ) {
+    if ( !$en ) {
         my ( $p, $f, $l ) = caller;    # construct event name by:
         $en = "$p:$f:$l";              # package + filename + line
                                        # print STDERR "EN: $en\n";
@@ -39,12 +38,12 @@ sub flood_check {
 
     $FLOOD{$en} ||= [];                # make empty flood array for this event name
     my $ar = $FLOOD{$en};              # get array ref for event's flood array
-    my $ec = @$ar;                     # events count in the flood array
+    my $ec = @{$ar};                   # events count in the flood array
 
     if ( $ec >= $fc ) {
 
         # flood array has enough events to do real flood check
-        my $ot = $$ar[0];              # oldest event timestamp in the flood array
+        my $ot = $ar->[0];             # oldest event timestamp in the flood array
         my $tp = time() - $ot;         # time period between current and oldest event
 
         # now calculate time in seconds until next allowed event
@@ -59,12 +58,12 @@ sub flood_check {
 
         # negative or 0 seconds means that event should be accepted
         # oldest event is removed from the flood array
-        shift @$ar;
+        shift @{$ar};
     }
 
     # flood array is not full or oldest event is already removed
     # so current event has to be added
-    push @$ar, time();
+    push @{$ar}, time();
 
     # event is ok
     return 0;
@@ -72,8 +71,9 @@ sub flood_check {
 
 sub flood_storage {
     if (@_) {
-        croak "flood_storage sub requires hash reference as single argument"
-          unless ref( $_[0] ) eq 'HASH';
+        if ( ref( $_[0] ) ne 'HASH' ) {
+            croak "flood_storage sub requires hash reference as single argument"
+        }
         %FLOOD = %{ $_[0] };
     }
     return \%FLOOD;
@@ -82,35 +82,39 @@ sub flood_storage {
 ################# OOP ###########################
 
 sub new {
-    my $class = shift;
-    my $params = validate @_, {
-        storage => { type => OBJECT },
+    my $class  = shift;
+    my $params = validate @_,
+      {
+        storage      => { type => OBJECT },
         backend_name => { type => SCALAR, optional => 1 },
-        limits => { type => HASHREF }
-    };
-    my $self = $class->SUPER::new( $params );
+        limits       => { type => HASHREF }
+      };
+    my $self = $class->SUPER::new($params);
+
     # be default backend will be selected by storage classname. but you can override it
     my $backend_name = __PACKAGE__ . '::Backend::' . ( $self->{backend_name} || ref $self->storage );
     load $backend_name;
-    $self->backend_name( $backend_name );
+    $self->backend_name($backend_name);
     return $self;
 }
 
 sub is_user_overrated {
-    my $self = shift;
-    my ( $limit, $identifier ) = validate_pos @_, { type => SCALAR }, { type => SCALAR };
-    my @configs = @{ $self->{ limits }{ $limit } };
+    my ( $self, @params ) = @_;
+    my ( $limit, $identifier ) = validate_pos @params, { type => SCALAR }, { type => SCALAR };
+    my @configs     = @{ $self->{limits}{$limit} };
     my $max_timeout = 0;
-    foreach my $config ( @configs ) {
-        my $prefix = __PACKAGE__ . '_rc_' . "$identifier|$limit|$config->{period}";
-        my $backend = $self->backend_name->new( {
-            storage => $self->storage,
-            expires => $config->{ period },
-            prefix => $prefix
-        } );
-        my $info = $backend->get_info;
+    foreach my $config (@configs) {
+        my $prefix  = __PACKAGE__ . '_rc_' . "$identifier|$limit|$config->{period}";
+        my $backend = $self->backend_name->new(
+            {
+                storage => $self->storage,
+                expires => $config->{period},
+                prefix  => $prefix
+            }
+        );
+        my $info = $backend->get_info( $config->{attempts} );
         if ( $info->{size} >= $config->{attempts} && $info->{timeout} > $max_timeout ) {
-            $max_timeout = $info->{timeout} - time;
+            $max_timeout = $info->{timeout};
         }
     }
     return $max_timeout;
@@ -120,15 +124,17 @@ sub get_attempt_count {
     my $self = shift;
     my ( $limit, $identifier ) = validate_pos @_, { type => SCALAR }, { type => SCALAR };
     my %attempts;
-    my @configs = @{ $self->{ limits }{ $limit } };
-    foreach my $config ( @configs ) {
+    my @configs = @{ $self->{limits}{$limit} };
+    foreach my $config (@configs) {
         my $prefix = __PACKAGE__ . '_rc_' . "$identifier|$limit|$config->{period}";
-        my $queue = $self->backend_name->new( {
-            storage => $self->storage,
-            expires => $config->{ period },
-            prefix => $prefix
-        } );
-        $attempts{ $config->{ period } } = $queue->get_info->{size};
+        my $queue  = $self->backend_name->new(
+            {
+                storage => $self->storage,
+                expires => $config->{period},
+                prefix  => $prefix
+            }
+        );
+        $attempts{ $config->{period} } = $queue->get_info( $config->{attempts} )->{size};
     }
     return \%attempts;
 }
@@ -136,16 +142,17 @@ sub get_attempt_count {
 sub register_attempt {
     my $self = shift;
     my ( $limit, $identifier ) = validate_pos @_, { type => SCALAR }, { type => SCALAR };
-    my $is_robot;
-    my @configs = @{ $self->{ limits }{ $limit } };
-    my $is_overrated = $self->is_user_overrated( @_ );
-    foreach my $config ( @configs ) {
+    my @configs      = @{ $self->{limits}{$limit} };
+    my $is_overrated = $self->is_user_overrated(@_);
+    foreach my $config (@configs) {
         my $prefix = __PACKAGE__ . '_rc_' . "$identifier|$limit|$config->{period}";
-        my $queue = $self->backend_name->new( {
-            storage => $self->storage,
-            expires => $config->{ period },
-            prefix => $prefix
-        } );
+        my $queue  = $self->backend_name->new(
+            {
+                storage => $self->storage,
+                expires => $config->{period},
+                prefix  => $prefix
+            }
+        );
         $queue->increment;
     }
     return $is_overrated;
@@ -299,15 +306,21 @@ be useful. I used it in IRC bots, email notifications, web site updates, etc.
 
 =head1 AUTHOR
 
-    Vladi Belperchinov-Shabanski "Cade"
+    Vladi Belperchinov-Shabanski "Cade" - up to 1.00
 
     <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 
     http://cade.datamax.bg
 
-    Andrey Kostenko "GuGu" <andrey@kostenko.name>
+    Andrey Kostenko "GuGu" <andrey@kostenko.name> - 1.00 - 2.00
 
     http://kostenko.name
+
+=head1 BUGS
+
+No bugs.
+
+=head1 NOTES
 
 =head1 COPYRIGHT & LICENSE
 

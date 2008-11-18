@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 use Params::Validate qw/:all/;
-use base 'Class::Accessor::Fast';
+use base 'Algorithm::FloodControl::Backend';
 
-__PACKAGE__->mk_accessors( qw/storage prefix expires/ );
+our ($VERSION) = '$Revision: 2609 $' =~ m{ \$Revision: \s+ (\S+) }mx;
 
 =head2 increment
 
@@ -31,33 +31,6 @@ sub increment {
 sub clear {
     my ($self) = @_;
     return $self->storage->delete( $self->_tail_name );
-}
-
-=head2 get_info
-
-=cut
-
-sub get_info {
-    my $self   = shift;
-    my $size   = 0;
-    my $number = $self->_last_number;
-    if ( ! defined $number ) {
-        return {
-            size => $size,
-            timeout => 0
-        };
-    }
-    my $last_timeout;
-    my $timeout;
-    while ( defined ( $timeout = $self->get_item($number) ) ){
-        $last_timeout = $timeout;
-        $size++;
-        $number--;
-    }
-    return {
-        size => $size, 
-        timeout => $last_timeout
-    };
 }
 
 =head2 get_item

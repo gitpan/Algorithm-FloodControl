@@ -12,6 +12,7 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Algorithm/FloodControl.pm
+lib/Algorithm/FloodControl/Backend.pm
 lib/Algorithm/FloodControl/Backend/Cache/FastMmap.pm
 lib/Algorithm/FloodControl/Backend/Cache/Memcached.pm
 lib/Algorithm/FloodControl/Backend/Cache/Memcached/Fast.pm
@@ -20,7 +21,7 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
-t/tlib.pm
+svn-commit.tmp
 t/00-load.t
 t/01-cache-memcached-fast.t
 t/02-cache-memcached.t
@@ -29,3 +30,4 @@ t/04-cache-fastmmap.t
 t/boilerplate.t
 t/pod-coverage.t
 t/pod.t
+t/tlib.pm
