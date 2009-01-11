@@ -19,11 +19,8 @@ no_index:
     - t
 requires:
   Class::Accessor::Fast: 0
-  Module::Install: 0.77
   Module::Load: 0
   Params::Validate: 0
-  perl: 5.8.0
-  version: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.970000
+version: 1.98

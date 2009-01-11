@@ -4,8 +4,7 @@ use utf8;
 use strict;
 use warnings;
 use Test::More;
-our $skip_concurrency;
-$tlib::skip_concurrency = 0;
+our $skip_concurrency = 0;
 sub test_backend {
     my $storage_name = shift;
     my @params = @_;
@@ -23,14 +22,14 @@ sub test_backend {
     $c->increment;
     my $info = $c->get_info(100);
     is( $info->{size}, $oldsize + 2, 'yet another' );
-    cmp_ok( $info->{timeout}, '>=', 3, 'timeout' );
+    cmp_ok( $info->{timeout}, '>=', 0, 'timeout' );
     sleep 3;
     $c->increment;
     sleep 3;
     is( $c->get_info->{size}, 1, 'expiring' );
     ok( $c->clear, 'clearing' );
 SKIP: {
-    skip 'Concurrency is not working', 1 if $tlib::skip_concurrency;
+    skip 'Concurrency is not working', 1 if $skip_concurrency;
     foreach ( 1 .. 15 ) {
         if ( !fork ) {
 
