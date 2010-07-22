@@ -11,7 +11,7 @@ use base 'Class::Accessor::Fast';
 use Exporter 'import';
 use Module::Load;
 
-use version; our $VERSION = qv("1.990")->numify;
+use version; our $VERSION = qv("2.0")->numify;
 our @EXPORT = qw(
   flood_check
   flood_storage
